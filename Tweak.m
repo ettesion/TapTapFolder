@@ -1,7 +1,7 @@
 #import <Foundation/Foundation.h>
 #import <CoreFoundation/CoreFoundation.h>
 #import <UIKit/UIKit.h>
-#import <CaptainHook.h>
+#import <CaptainHook/CaptainHook.h>
 
 extern void _CFXPreferencesRegisterDefaultValues(CFDictionaryRef defaultValues);
 
