@@ -60,6 +60,7 @@ static NSString * const kUse3DTouchKey = @"Use3DTouch";
 static NSString * const kDoubleTapTimeoutKey = @"DoubleTapTimeout";
 
 static SBIconView *tappedIcon;
+static NSDate *lastTouchedTime;
 static NSDate *lastTappedTime;
 static BOOL doubleTapRecognized;
 
@@ -109,9 +110,11 @@ static BOOL is3DTouchEnabled(SBIconView *view) {
 }
 
 static void launchFirstApp(SBIconView *iconView);
+static void launchSecondApp(SBIconView *iconView);
 static void openFolder(SBIconView *iconView);
 static void singleTapAction(SBIconView *iconView);
 static void doubleTapAction(SBIconView *iconView);
+static void shortHoldAction(SBIconView *iconView);
 
 CHOptimizedMethod(1, self, void, SBIconController, iconTapped, SBIconView *, iconView) {
     if (!self.isEditing && !self.hasOpenFolder && isFolderIconView(iconView)) {
@@ -119,7 +122,10 @@ CHOptimizedMethod(1, self, void, SBIconController, iconTapped, SBIconView *, ico
             singleTapAction(iconView);
         } else {
             NSDate *nowTime = [NSDate date];
-            if (iconView == tappedIcon) {
+            if (lastTouchedTime && [nowTime timeIntervalSinceDate:lastTouchedTime] >= 0.3) {
+                shortHoldAction(iconView);
+                return;
+            } else if (iconView == tappedIcon) {
                 if ([nowTime timeIntervalSinceDate:lastTappedTime] < getPreferenceFloatValue(kDoubleTapTimeoutKey)) {
                     doubleTapRecognized = YES;
                     doubleTapAction(iconView);
@@ -171,6 +177,17 @@ static void launchFirstApp(SBIconView *iconView) {
     }
 }
 
+static void launchSecondApp(SBIconView *iconView) {
+	SBIcon *secondIcon = [((SBFolderIconView *)iconView).folderIcon.folder iconAtIndexPath:[NSIndexPath indexPathForRow:1 inSection:0]];
+	if (secondIcon == nil) return;
+	if([secondIcon respondsToSelector:@selector(launchFromLocation:context:)]) {
+		[secondIcon launchFromLocation:0 context:nil];
+	} else {
+		[secondIcon launchFromLocation:0];
+	}
+	iconView.highlighted = NO;
+}
+
 static void openFolder(SBIconView *iconView) {
     id self = CHSharedInstance(SBIconController);
     CHSuper(1, SBIconController, iconTapped, iconView);
@@ -190,6 +207,22 @@ static void doubleTapAction(SBIconView *iconView) {
     } else {
         openFolder(iconView);
     }
+}
+
+static void shortHoldAction(SBIconView *iconView) {
+	launchSecondApp(iconView);
+}
+
+CHOptimizedMethod(1, self, void, SBIconController, iconHandleLongPress, SBIconView *, iconView)
+{
+    lastTouchedTime = nil;
+    CHSuper(1, SBIconController, iconHandleLongPress, iconView);
+}
+
+CHOptimizedMethod(1, self, void, SBIconController, iconTouchBegan, SBIconView *, iconView)
+{
+    lastTouchedTime = [NSDate date];
+    CHSuper(1, SBIconController, iconTouchBegan, iconView);
 }
 
 CHOptimizedClassMethod(2, self, CGRect, SBIconGridImage, rectAtIndex, NSUInteger, index, maxCount, NSUInteger, count) {
@@ -212,6 +245,8 @@ CHConstructor {
         CHLoadLateClass(SBIconGridImage);
         CHHook(1, SBIconController, iconTapped);
         CHHook(1, SBIconController, _handleShortcutMenuPeek);
+        CHHook(1, SBIconController, iconHandleLongPress);
+        CHHook(1, SBIconController, iconTouchBegan);
         CHHook(2, SBIconGridImage, rectAtIndex, maxCount);
         CHHook(3, SBIconGridImage, rectAtIndex, forImage, maxCount);
     }
