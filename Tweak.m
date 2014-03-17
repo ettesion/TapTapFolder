@@ -49,6 +49,7 @@ extern void _CFXPreferencesRegisterDefaultValues(CFDictionaryRef defaultValues);
 - (void)iconTapped:(SBIconView *)iconView;
 - (BOOL)isEditing;
 - (BOOL)hasOpenFolder;
+- (BOOL)isEditing;
 - (void)_handleShortcutMenuPeek:(UILongPressGestureRecognizer *)recognizer;
 @end
 
