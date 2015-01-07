@@ -24,6 +24,7 @@ extern void _CFXPreferencesRegisterDefaultValues(CFDictionaryRef defaultValues);
 - (void)launchFromLocation:(NSInteger)location context:(id)context; //iOS 8.3
 - (BOOL)isFolderIcon;
 - (BOOL)isNewsstandIcon;
+- (NSString *)applicationBundleID;
 @end
 
 @interface SBFolder : NSObject
@@ -55,6 +56,7 @@ extern void _CFXPreferencesRegisterDefaultValues(CFDictionaryRef defaultValues);
 
 static NSString * const kIdentifier = @"me.qusic.taptapfolder";
 static NSString * const kReversedBehaviorKey = @"ReversedBehavior";
+static NSString * const kSwapMobilecalKey = @"SwapMobilecal";
 static NSString * const kKeepFolderPreviewKey = @"KeepFolderPreview";
 static NSString * const kUse3DTouchKey = @"Use3DTouch";
 static NSString * const kDoubleTapTimeoutKey = @"DoubleTapTimeout";
@@ -71,6 +73,7 @@ CHDeclareClass(SBIconGridImage)
 static void registerPreferenceDefaultValues(void) {
     _CFXPreferencesRegisterDefaultValues((__bridge CFDictionaryRef)@{
         kReversedBehaviorKey: @YES,
+        kSwapMobilecalKey: @NO,
         kKeepFolderPreviewKey: @YES,
         kUse3DTouchKey: @YES,
         kDoubleTapTimeoutKey: @0.2
@@ -110,6 +113,7 @@ static BOOL is3DTouchEnabled(SBIconView *view) {
 }
 
 static SBIcon *getFirstIcon(SBIconView *iconView);
+BOOL swapIcons(SBIconView *iconView);
 static void launchFirstApp(SBIconView *iconView);
 static void launchSecondApp(SBIconView *iconView);
 static void openFolder(SBIconView *iconView);
@@ -168,6 +172,17 @@ static SBIcon *getFirstIcon(SBIconView *iconView) {
 	return [((SBFolderIconView *)iconView).folderIcon.folder iconAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]];
 }
 
+BOOL swapIcons(SBIconView *iconView) {
+	if (getPreferenceBoolValue(kSwapMobilecalKey)) {
+		SBIcon *firstIcon = getFirstIcon(iconView);
+		NSString *bundleId = [firstIcon applicationBundleID];
+		if (firstIcon && [bundleId isEqualToString:@"com.apple.mobilecal"]) {
+			return YES;
+		}
+	}
+	return NO;
+}
+
 static void launchFirstApp(SBIconView *iconView) {
     SBIcon *firstIcon = getFirstIcon(iconView);
     if([firstIcon respondsToSelector:@selector(launchFromLocation:context:)]) {
@@ -202,20 +217,32 @@ static void singleTapAction(SBIconView *iconView) {
     if (getPreferenceBoolValue(kReversedBehaviorKey)) {
         openFolder(iconView);
     } else {
-        launchFirstApp(iconView);
+        if (swapIcons(iconView)) {
+            launchSecondApp(iconView);
+        } else {
+            launchFirstApp(iconView);
+        }
     }
 }
 
 static void doubleTapAction(SBIconView *iconView) {
     if (getPreferenceBoolValue(kReversedBehaviorKey)) {
-        launchFirstApp(iconView);
+        if (swapIcons(iconView)) {
+            launchSecondApp(iconView);
+        } else {
+            launchFirstApp(iconView);
+        }
     } else {
         openFolder(iconView);
     }
 }
 
 static void shortHoldAction(SBIconView *iconView) {
-	launchSecondApp(iconView);
+	if (swapIcons(iconView)) {
+		launchFirstApp(iconView);
+	} else {
+		launchSecondApp(iconView);
+	}
 }
 
 CHOptimizedMethod(1, self, void, SBIconController, iconHandleLongPress, SBIconView *, iconView)

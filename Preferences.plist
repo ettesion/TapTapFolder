@@ -37,6 +37,26 @@
 			<key>cell</key>
 			<string>PSGroupCell</string>
 			<key>footerText</key>
+			<string>When enabled, folder with Calendar app at the top will behave as if the second app is at the top while Calendar icon is shown as the face.</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSSwitchCell</string>
+			<key>defaults</key>
+			<string>me.qusic.taptapfolder</string>
+			<key>key</key>
+			<string>SwapMobilecal</string>
+			<key>label</key>
+			<string>Swap Calendar &amp; 2nd App</string>
+			<key>default</key>
+			<false/>
+			<key>PostNotification</key>
+			<string>me.qusic.taptapfolder.preferencesChanged</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>footerText</key>
 			<string>When enabled, folder icons won&apos;t be modified. Respring is required for this change to take effect.</string>
 		</dict>
 		<dict>
