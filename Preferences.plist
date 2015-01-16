@@ -19,7 +19,7 @@
 			<key>cell</key>
 			<string>PSGroupCell</string>
 			<key>footerText</key>
-			<string>When enabled, single tap to open folder while double tap to open the first app.</string>
+			<string>When enabled, single tap opens a folder while double tap launches the first app in it.</string>
 		</dict>
 		<dict>
 			<key>cell</key>
@@ -29,7 +29,7 @@
 			<key>key</key>
 			<string>ReversedBehavior</string>
 			<key>label</key>
-			<string>Reversed Behavior</string>
+			<string>Double Tap To Launch App</string>
 			<key>default</key>
 			<true/>
 		</dict>
