@@ -60,6 +60,7 @@ static NSString * const kSwapMobilecalKey = @"SwapMobilecal";
 static NSString * const kKeepFolderPreviewKey = @"KeepFolderPreview";
 static NSString * const kUse3DTouchKey = @"Use3DTouch";
 static NSString * const kDoubleTapTimeoutKey = @"DoubleTapTimeout";
+static NSString * const kShortHoldTimeoutKey = @"ShortHoldTimeout";
 
 static SBIconView *tappedIcon;
 static NSDate *lastTouchedTime;
@@ -76,7 +77,8 @@ static void registerPreferenceDefaultValues(void) {
         kSwapMobilecalKey: @NO,
         kKeepFolderPreviewKey: @YES,
         kUse3DTouchKey: @YES,
-        kDoubleTapTimeoutKey: @0.2
+        kDoubleTapTimeoutKey: @0.2,
+        kShortHoldTimeoutKey: @0.3
     });
 }
 
@@ -127,7 +129,7 @@ CHOptimizedMethod(1, self, void, SBIconController, iconTapped, SBIconView *, ico
             singleTapAction(iconView);
         } else {
             NSDate *nowTime = [NSDate date];
-            if (lastTouchedTime && [nowTime timeIntervalSinceDate:lastTouchedTime] >= 0.3) {
+            if (lastTouchedTime && [nowTime timeIntervalSinceDate:lastTouchedTime] >= getPreferenceFloatValue(kShortHoldTimeoutKey)) {
                 shortHoldAction(iconView);
                 return;
             } else if (iconView == tappedIcon) {

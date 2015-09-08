@@ -117,6 +117,26 @@
 		</dict>
 		<dict>
 			<key>cell</key>
+			<string>PSTitleValueCell</string>
+			<key>label</key>
+			<string>Short Hold Timeout</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSSliderCell</string>
+			<key>defaults</key>
+			<string>me.qusic.taptapfolder</string>
+			<key>key</key>
+			<string>ShortHoldTimeout</string>
+			<key>min</key>
+			<real>0.1</real>
+			<key>max</key>
+			<real>1</real>
+			<key>default</key>
+			<real>0.3</real>
+		</dict>
+		<dict>
+			<key>cell</key>
 			<string>PSGroupCell</string>
 			<key>footerText</key>
 			<string>TapTapFolder © Qusic</string>
