@@ -109,6 +109,7 @@ static BOOL is3DTouchEnabled(SBIconView *view) {
     return getPreferenceBoolValue(kUse3DTouchKey) && [view respondsToSelector:@selector(traitCollection)] && [view.traitCollection respondsToSelector:@selector(forceTouchCapability)] && view.traitCollection.forceTouchCapability == UIForceTouchCapabilityAvailable;
 }
 
+static SBIcon *getFirstIcon(SBIconView *iconView);
 static void launchFirstApp(SBIconView *iconView);
 static void launchSecondApp(SBIconView *iconView);
 static void openFolder(SBIconView *iconView);
@@ -163,8 +164,12 @@ CHOptimizedMethod(1, self, void, SBIconController, _handleShortcutMenuPeek, UILo
     }
 }
 
+static SBIcon *getFirstIcon(SBIconView *iconView) {
+	return [((SBFolderIconView *)iconView).folderIcon.folder iconAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]];
+}
+
 static void launchFirstApp(SBIconView *iconView) {
-    SBIcon *firstIcon = [((SBFolderIconView *)iconView).folderIcon.folder iconAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]];
+    SBIcon *firstIcon = getFirstIcon(iconView);
     if([firstIcon respondsToSelector:@selector(launchFromLocation:context:)]) {
         [firstIcon launchFromLocation:0 context:nil];
     } else if ([firstIcon respondsToSelector:@selector(launchFromLocation:)]) {
